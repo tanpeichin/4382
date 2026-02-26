@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404WEAR | Minimal Checkout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            padding: 20px;
+            perspective: 1000px;
+            color: #1a1a1a;
+        }
+
+        /* 极简容器 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: fadeUp 1s ease;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 纯白极简头部 */
+        header {
+            background: white;
+            border-radius: 32px;
+            padding: 32px;
+            margin-bottom: 30px;
+            box-shadow: 
+                0 20px 40px -10px rgba(0,0,0,0.05),
+                0 0 0 1px rgba(0,0,0,0.02) inset;
+            transform: translateZ(10px);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        header:hover {
+            transform: translateZ(15px);
+            box-shadow: 
+                0 30px 50px -15px rgba(0,0,0,0.1),
+                0 0 0 1px rgba(0,0,0,0.03) inset;
+        }
+
+        .brand {
+            text-align: center;
+        }
+
+        .brand h1 {
+            font-size: 40px;
+            font-weight: 500;
+            letter-spacing: 4px;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .brand p {
+            color: #666;
+            font-size: 12px;
+            letter-spacing: 3px;
+            font-weight: 300;
+        }
+
+        /* 极简进度条 */
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 32px;
+            position: relative;
+        }
+
+        .progress:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: #e0e0e0;
+            transform: translateY(-50%);
+        }
+
+        .step {
+            position: relative;
+            padding: 8px 24px;
+            background: white;
+            font-size: 14px;
+            font-weight: 400;
+            color: #999;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            color: #000;
+            font-weight: 500;
+        }
+
+        .step.active:after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: #000;
+            border-radius: 50%;
+        }
+
+        .step.completed {
+            color: #000;
+        }
+
+        .step.completed:before {
+            content: '—';
+            position: absolute;
+            left: -20px;
+            color: #000;
+        }
+
+        /* 主网格 */
+        main {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 30px;
+            transform-style: preserve-3d;
+        }
+
+        /* 极简表单卡片 */
+        .form-section {
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: 
+                0 30px 60px -20px rgba(0,0,0,0.08),
+                0 0 0 1px rgba(0,0,0,0.02) inset;
+            transform: translateZ(20px) rotateX(0.5deg);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .form-section:hover {
+            transform: translateZ(25px) rotateX(0deg);
+            box-shadow: 
+                0 40px 80px -25px rgba(0,0,0,0.12),
+                0 0 0 1px rgba(0,0,0,0.03) inset;
+        }
+
+        h3 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #000;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 14px;
+            font-weight: 300;
+            margin-bottom: 32px;
+            letter-spacing: 0.3px;
+        }
+
+        /* 极简输入框 */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 400;
+            color: #666;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            font-size: 15px;
+            background: white;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: 0 10px 20px -15px rgba(0,0,0,0.2);
+        }
+
+        /* 文件上传样式 */
+        .file-upload {
+            border: 2px dashed #e0e0e0;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            margin: 20px 0;
+        }
+
+        .file-upload:hover {
+            border-color: #000;
+            background: #f5f5f5;
+        }
+
+        .file-upload.has-file {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .upload-text strong {
+            color: #000;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 150px;
+            margin-top: 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* 极简按钮 */
+        .btn-primary {
+            width: 100%;
+            padding: 18px;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 100px;
+            font-size: 15px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            transform: translateZ(10px);
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary:hover {
+            background: #1a1a1a;
+            transform: translateZ(15px) translateY(-2px);
+            box-shadow: 0 25px 35px -15px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateZ(5px) translateY(0);
+            box-shadow: 0 15px 25px -15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            padding: 16px 30px;
+            background: transparent;
+            color: #000;
+            border: 1px solid #e0e0e0;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: translateZ(8px);
+        }
+
+        .btn-secondary:hover {
+            border-color: #000;
+            background: #fafafa;
+            transform: translateZ(12px) translateY(-2px);
+        }
+
+        /* 极简订单卡片 */
+        .summary-card {
+            background: white;
+            border-radius: 32px;
+            padding: 32px;
+            box-shadow: 
+                0 30px 60px -20px rgba(0,0,0,0.08),
+                0 0 0 1px rgba(0,0,0,0.02) inset;
+            transform: translateZ(20px) rotateX(-0.5deg);
+            position: sticky;
+            top: 20px;
+            transition: all 0.4s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateZ(25px) rotateX(0deg);
+            box-shadow: 0 40px 80px -25px rgba(0,0,0,0.12);
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .order-num {
+            color: #999;
+            font-size: 12px;
+            font-weight: 300;
+        }
+
+        /* 商品列表 */
+        .cart-items {
+            margin-bottom: 24px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid #f5f5f5;
+            transition: all 0.3s ease;
+        }
+
+        .cart-item:hover {
+            transform: translateX(5px);
+        }
+
+        .item-info strong {
+            font-size: 14px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .item-info p {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .item-price {
+            font-weight: 400;
+            color: #000;
+        }
+
+        /* 价格区域 */
+        .price-total {
+            padding: 24px 0 0;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .price-row.total {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 18px;
+            color: #000;
+            font-weight: 500;
+        }
+
+        /* 支付选项 - 极简设计 */
+        .payment-options {
+            margin: 32px 0;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #f0f0f0;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            transform: translateZ(5px);
+        }
+
+        .payment-option:hover {
+            border-color: #000;
+            transform: translateZ(10px) translateX(5px);
+            background: #fafafa;
+        }
+
+        .payment-option.selected {
+            border-color: #000;
+            background: #f8f8f8;
+            transform: translateZ(15px);
+            box-shadow: 0 15px 30px -20px rgba(0,0,0,0.3);
+        }
+
+        .payment-icon {
+            width: 40px;
+            height: 40px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-size: 16px;
+            color: #000;
+            transition: all 0.3s ease;
+        }
+
+        .payment-option:hover .payment-icon {
+            background: #000;
+            color: white;
+        }
+
+        /* QR容器 - 极简 */
+        .qr-container {
+            background: #fafafa;
+            border-radius: 24px;
+            padding: 32px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .qr-image-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 24px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px -10px rgba(0,0,0,0.1);
+        }
+
+        .qr-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .qr-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .qr-brand {
+            background: #0066FF;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .qr-amount {
+            background: #000;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        /* 上传凭证区域 */
+        .upload-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .upload-section h4 {
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        /* 银行账户信息卡片 (新增) */
+        .bank-details-card {
+            background: #f0f0f0;
+            border-radius: 20px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: left;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 5px 10px -5px rgba(0,0,0,0.05);
+        }
+        .bank-details-card p {
+            margin-bottom: 12px;
+            color: #333;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .bank-details-card .label {
+            width: 80px;
+            color: #666;
+            font-weight: 400;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .bank-details-card .value {
+            font-weight: 500;
+            color: #000;
+            background: white;
+            padding: 6px 16px;
+            border-radius: 40px;
+            display: inline-block;
+            font-family: monospace;
+            font-size: 16px;
+            border: 1px solid #ddd;
+        }
+        .bank-details-card .value.name-value {
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* 计时器 */
+        .timer {
+            margin-top: 20px;
+            padding: 16px;
+            background: #f5f5f5;
+            border-radius: 16px;
+            color: #666;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        /* 成功收据 - 极简 */
+        .receipt-container {
+            background: white;
+            border-radius: 40px;
+            padding: 60px;
+            max-width: 700px;
+            margin: 0 auto;
+            box-shadow: 0 50px 100px -40px rgba(0,0,0,0.2);
+            transform: translateZ(30px);
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            margin: 0 auto 32px;
+            transform: translateZ(20px);
+            transition: all 0.5s ease;
+        }
+
+        .success-icon:hover {
+            transform: translateZ(30px) scale(1.05);
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.3);
+        }
+
+        .payment-proof-preview {
+            margin: 20px 0;
+            border: 1px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 15px;
+            background: #fafafa;
+        }
+
+        .payment-proof-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+
+        /* 失败页面 */
+        .failed .success-icon {
+            background: #1a1a1a;
+        }
+
+        .failed .btn-primary {
+            background: #1a1a1a;
+        }
+
+        /* 天气小部件 */
+        .weather {
+            margin-top: 24px;
+            padding: 16px;
+            background: #fafafa;
+            border-radius: 16px;
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        /* 隐藏页面 */
+        .page {
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+            
+            .progress {
+                gap: 20px;
+            }
+            
+            .step {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .qr-image-container {
+                width: 180px;
+                height: 180px;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f5f5f5;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Page 1: Customer Details -->
+    <div class="page" id="pageDetails">
+        <div class="container">
+            <header>
+                <div class="brand">
+                    <h1>404WEAR</h1>
+                    <p>MINIMAL · ESSENTIAL · TIMELESS</p>
+                </div>
+                <div class="checkout-header">
+                    <div class="progress">
+                        <div class="step completed">Cart</div>
+                        <div class="step active">Details</div>
+                        <div class="step">Payment</div>
+                        <div class="step">Confirm</div>
+                    </div>
+                </div>
+            </header>
+
+            <main>
+                <section class="form-section">
+                    <h3>Customer information</h3>
+                    <p class="subtitle">Please provide your details</p>
+
+                    <form id="customerForm">
+                        <div class="form-group">
+                            <label>Full name</label>
+                            <input type="text" id="fullName" placeholder="John Doe" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email address</label>
+                            <input type="email" id="email" placeholder="john@example.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone number</label>
+                            <input type="tel" id="phone" placeholder="+60 12 345 6789" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Shipping address</label>
+                            <textarea id="address" rows="3" placeholder="Street address, City, Country" required></textarea>
+                        </div>
+
+                        <button type="button" class="btn-primary" onclick="goToPayment()">
+                            Continue to payment
+                        </button>
+                    </form>
+                </section>
+
+                <aside class="order-summary">
+                    <div class="summary-card">
+                        <div class="summary-header">
+                            <h3 style="font-size: 18px;">Order summary</h3>
+                            <p class="order-num" id="orderId">#404-001</p>
+                        </div>
+
+                        <div class="cart-items">
+                            <p style="color: #999; font-size: 12px; margin-bottom: 16px;">Items (<span id="itemCount">0</span>)</p>
+                            <div id="cartItemsList"></div>
+                        </div>
+
+                        <div class="price-total">
+                            <div class="price-row">
+                                <span>Subtotal</span>
+                                <span>RM <span id="subtotal">0.00</span></span>
+                            </div>
+                            <div class="price-row">
+                                <span>Shipping</span>
+                                <span>RM <span id="shipping">5.00</span></span>
+                            </div>
+                            <div class="price-row">
+                                <span>Tax (6% SST)</span>
+                                <span>RM <span id="tax">0.00</span></span>
+                            </div>
+                            <div class="price-row total">
+                                <span>Total</span>
+                                <span>RM <span id="total">0.00</span></span>
+                            </div>
+                        </div>
+
+                        <div class="weather">
+                            <span>⏤ 28°C · Partly cloudy ⏤</span>
+                        </div>
+                    </div>
+                </aside>
+            </main>
+        </div>
+    </div>
+
+    <!-- Page 2: Payment Methods -->
+    <div class="page hidden" id="pagePayment">
+        <div class="container">
+            <header>
+                <div class="brand">
+                    <h1>404WEAR</h1>
+                    <p>MINIMAL · ESSENTIAL · TIMELESS</p>
+                </div>
+                <div class="checkout-header">
+                    <div class="progress">
+                        <div class="step completed">Cart</div>
+                        <div class="step completed">Details</div>
+                        <div class="step active">Payment</div>
+                        <div class="step">Confirm</div>
+                    </div>
+                </div>
+            </header>
+
+            <main>
+                <section class="form-section">
+                    <h3>Payment method</h3>
+                    <p class="subtitle">Select your preferred option</p>
+
+                    <div class="payment-options">
+                        <!-- Credit Card -->
+                        <div class="payment-option" onclick="selectPayment('card')">
+                            <div class="payment-icon">💳</div>
+                            <div style="flex: 1;">
+                                <strong style="font-size: 14px;">Credit / Debit Card</strong>
+                            </div>
+                        </div>
+
+                        <!-- Touch 'n Go -->
+                        <div class="payment-option" onclick="selectPayment('tng')">
+                            <div class="payment-icon">TNG</div>
+                            <div style="flex: 1;">
+                                <strong style="font-size: 14px;">Touch 'n Go eWallet</strong>
+                            </div>
+                        </div>
+
+                        <!-- GrabPay -->
+                        <div class="payment-option" onclick="selectPayment('grab')">
+                            <div class="payment-icon">GRAB</div>
+                            <div style="flex: 1;">
+                                <strong style="font-size: 14px;">GrabPay</strong>
+                            </div>
+                        </div>
+
+                        <!-- Online Banking (Public Bank) -->
+                        <div class="payment-option" onclick="selectPayment('bank')">
+                            <div class="payment-icon">🏦</div>
+                            <div style="flex: 1;">
+                                <strong style="font-size: 14px;">Public Bank (Online Banking)</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Credit Card Form -->
+                    <div class="payment-form hidden" id="cardForm">
+                        <div style="margin-top: 24px;">
+                            <div class="form-group">
+                                <label>Card number</label>
+                                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label>Expiry</label>
+                                    <input type="text" id="expiry" placeholder="MM/YY">
+                                </div>
+                                <div class="form-group">
+                                    <label>CVV</label>
+                                    <input type="password" id="cvv" placeholder="123">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Name on card</label>
+                                <input type="text" id="cardName" placeholder="JOHN DOE">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Touch 'n Go QR with Upload -->
+                    <div class="payment-form hidden" id="tngForm">
+                        <div class="qr-container">
+                            <div class="qr-image-container">
+                                <img src="images/tng-qr.jpeg" alt="Touch 'n Go QR Code" class="qr-image"
+                                     onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5UbmcgUVIgTm90IEZvdW5kPC90ZXh0Pjwvc3ZnPg==';">
+                                <div class="qr-overlay">
+                                    <span class="qr-brand">TNG</span>
+                                    <span class="qr-amount">RM <span id="tngAmount">0.00</span></span>
+                                </div>
+                            </div>
+                            <p style="margin-bottom: 8px;">Amount: <strong>RM <span id="tngAmount2">0.00</span></strong></p>
+                            <div class="timer">
+                                <span>QR expires in <span id="timer">05:00</span></span>
+                            </div>
+
+                            <!-- 上传付款凭证 -->
+                            <div class="upload-section">
+                                <h4>Upload payment proof</h4>
+                                <div class="file-upload" id="tngUpload" onclick="document.getElementById('tngFile').click()">
+                                    <input type="file" id="tngFile" accept="image/*" onchange="handleFileUpload(this, 'tng')">
+                                    <div class="file-upload-label">
+                                        <span class="upload-icon">📎</span>
+                                        <span class="upload-text">Click to upload <strong>TNG payment screenshot</strong></span>
+                                        <span class="upload-text" style="font-size: 12px;">JPEG, PNG up to 5MB</span>
+                                    </div>
+                                    <div class="file-name" id="tngFileName"></div>
+                                    <img class="preview-image" id="tngPreview" style="display: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GrabPay QR with Upload -->
+                    <div class="payment-form hidden" id="grabForm">
+                        <div class="qr-container">
+                            <div class="qr-image-container">
+                                <img src="images/grabpay-qr.jpeg" alt="GrabPay QR Code" class="qr-image"
+                                     onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5HcmFiIFFSIE5vdCBGb3VuZDwvdGV4dD48L3N2Zz4=';">
+                                <div class="qr-overlay">
+                                    <span class="qr-brand">GRAB</span>
+                                    <span class="qr-amount">RM <span id="grabAmount">0.00</span></span>
+                                </div>
+                            </div>
+                            <p style="margin-bottom: 8px;">Amount: <strong>RM <span id="grabAmount2">0.00</span></strong></p>
+                            <div class="timer">
+                                <span>QR expires in <span id="grabTimer">05:00</span></span>
+                            </div>
+
+                            <!-- 上传付款凭证 -->
+                            <div class="upload-section">
+                                <h4>Upload payment proof</h4>
+                                <div class="file-upload" id="grabUpload" onclick="document.getElementById('grabFile').click()">
+                                    <input type="file" id="grabFile" accept="image/*" onchange="handleFileUpload(this, 'grab')">
+                                    <div class="file-upload-label">
+                                        <span class="upload-icon">📎</span>
+                                        <span class="upload-text">Click to upload <strong>GrabPay payment screenshot</strong></span>
+                                        <span class="upload-text" style="font-size: 12px;">JPEG, PNG up to 5MB</span>
+                                    </div>
+                                    <div class="file-name" id="grabFileName"></div>
+                                    <img class="preview-image" id="grabPreview" style="display: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Online Banking (Public Bank) - 已添加银行账号 -->
+                    <div class="payment-form hidden" id="bankForm">
+                        <div style="margin-top: 24px;">
+                            <!-- 银行账户信息卡片 (Public Bank) -->
+                            <div class="bank-details-card">
+                                <p>
+                                    <span class="label">Bank:</span>
+                                    <span class="value" style="background: #e6f0ff; border-color: #0066FF;">Public Bank</span>
+                                </p>
+                                <p>
+                                    <span class="label">Name:</span>
+                                    <span class="value name-value">Tan Pei Chin</span>
+                                </p>
+                                <p>
+                                    <span class="label">Account:</span>
+                                    <span class="value">5101791817</span>
+                                </p>
+                                <p style="color: #444; font-size: 13px; margin-top: 16px; margin-bottom: 0; background: white; padding: 12px; border-radius: 12px;">
+                                    💡 Please transfer the exact amount and upload the receipt below.
+                                </p>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Select bank (for redirection)</label>
+                                <select id="bankSelect">
+                                    <option value="">Choose a bank</option>
+                                    <option value="maybank">Maybank</option>
+                                    <option value="cimb">CIMB Bank</option>
+                                    <option value="public" selected>Public Bank</option>
+                                    <option value="hongleong">Hong Leong Bank</option>
+                                </select>
+                            </div>
+                            <p style="color: #999; font-size: 12px; margin-top: 8px;">You'll be redirected to your bank's login page after uploading proof.</p>
+                            
+                            <!-- 上传付款凭证 -->
+                            <div class="upload-section">
+                                <h4>Upload payment proof</h4>
+                                <div class="file-upload" id="bankUpload" onclick="document.getElementById('bankFile').click()">
+                                    <input type="file" id="bankFile" accept="image/*" onchange="handleFileUpload(this, 'bank')">
+                                    <div class="file-upload-label">
+                                        <span class="upload-icon">📎</span>
+                                        <span class="upload-text">Click to upload <strong>bank transfer receipt</strong></span>
+                                        <span class="upload-text" style="font-size: 12px;">JPEG, PNG, PDF up to 5MB</span>
+                                    </div>
+                                    <div class="file-name" id="bankFileName"></div>
+                                    <img class="preview-image" id="bankPreview" style="display: none;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 16px; margin-top: 32px;">
+                        <button class="btn-secondary" onclick="goBackToDetails()" style="flex: 1;">Back</button>
+                        <button class="btn-primary" onclick="processPayment()" style="flex: 2;">Pay now</button>
+                    </div>
+                </section>
+
+                <aside class="order-summary">
+                    <div class="summary-card">
+                        <div class="summary-header">
+                            <h3 style="font-size: 18px;">Payment</h3>
+                            <p class="order-num" id="paymentOrderId">#404-001</p>
+                        </div>
+
+                        <div style="text-align: center; margin: 32px 0;">
+                            <p style="color: #999; font-size: 12px; margin-bottom: 8px;">Total amount</p>
+                            <div style="font-size: 36px; font-weight: 300; color: #000;">
+                                RM <span id="paymentTotal">0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="weather">
+                            <span>⏤ 28°C · Partly cloudy ⏤</span>
+                        </div>
+                    </div>
+                </aside>
+            </main>
+        </div>
+    </div>
+
+    <!-- Page 3: Receipt (Success) -->
+    <div class="page hidden" id="pageReceiptSuccess">
+        <div class="container">
+            <div class="receipt-container">
+                <div class="success-icon">✓</div>
+                
+                <h3 style="font-size: 28px; font-weight: 300; text-align: center; margin-bottom: 8px;">Payment successful</h3>
+                <p style="color: #999; text-align: center; margin-bottom: 48px;">Thank you for your purchase</p>
+
+                <div style="border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; padding: 32px 0; margin-bottom: 32px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
+                        <div>
+                            <p style="color: #999; font-size: 11px; margin-bottom: 4px;">ORDER NUMBER</p>
+                            <p style="font-size: 14px;" id="receiptOrderId">404-001</p>
+                        </div>
+                        <div>
+                            <p style="color: #999; font-size: 11px; margin-bottom: 4px;">DATE</p>
+                            <p style="font-size: 14px;" id="receiptDate">17 Feb 2026</p>
+                        </div>
+                        <div>
+                            <p style="color: #999; font-size: 11px; margin-bottom: 4px;">PAYMENT</p>
+                            <p style="font-size: 14px;" id="receiptPaymentMethod">Card</p>
+                        </div>
+                        <div>
+                            <p style="color: #999; font-size: 11px; margin-bottom: 4px;">STATUS</p>
+                            <p style="font-size: 14px; color: #000;">Completed</p>
+                        </div>
+                    </div>
+
+                    <h4 style="font-size: 14px; margin-bottom: 16px;">Order summary</h4>
+                    <div id="receiptItems" style="margin-bottom: 24px;"></div>
+
+                    <div style="border-top: 1px solid #f0f0f0; padding-top: 24px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #666;">Total paid</span>
+                            <span style="font-size: 20px; font-weight: 400;">RM <span id="receiptTotal">0.00</span></span>
+                        </div>
+                    </div>
+
+                    <!-- 显示上传的付款凭证 -->
+                    <div id="paymentProofSection" style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #f0f0f0; display: none;">
+                        <h4 style="font-size: 14px; margin-bottom: 16px;">Payment proof</h4>
+                        <div id="paymentProofImage" class="payment-proof-preview"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 32px;">
+                    <h4 style="font-size: 14px; margin-bottom: 16px;">Customer</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <p style="color: #999; font-size: 11px;">Name</p>
+                            <p style="font-size: 14px;" id="receiptName">-</p>
+                        </div>
+                        <div>
+                            <p style="color: #999; font-size: 11px;">Email</p>
+                            <p style="font-size: 14px;" id="receiptEmail">-</p>
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <p style="color: #999; font-size: 11px;">Address</p>
+                            <p style="font-size: 14px;" id="receiptAddress">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 16px;">
+                    <button class="btn-secondary" onclick="printReceipt()" style="flex: 1;">Print</button>
+                    <button class="btn-primary" onclick="goHome()" style="flex: 2;">Continue shopping</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 4: Payment Failed -->
+    <div class="page hidden" id="pageReceiptFailed">
+        <div class="container">
+            <div class="receipt-container failed">
+                <div class="success-icon" style="background: #1a1a1a;">✗</div>
+                
+                <h3 style="font-size: 28px; font-weight: 300; text-align: center; margin-bottom: 8px;">Payment failed</h3>
+                <p style="color: #999; text-align: center; margin-bottom: 48px;">Your transaction was not completed</p>
+
+                <div style="border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; padding: 32px 0; margin-bottom: 32px;">
+                    <div style="margin-bottom: 24px;">
+                        <p style="color: #999; font-size: 11px; margin-bottom: 8px;">ERROR</p>
+                        <p style="font-size: 14px;" id="errorMessage">Transaction declined</p>
+                    </div>
+
+                    <h4 style="font-size: 14px; margin-bottom: 16px;">Order summary</h4>
+                    <div id="failedItems" style="margin-bottom: 24px;"></div>
+
+                    <div style="border-top: 1px solid #f0f0f0; padding-top: 24px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #666;">Total amount</span>
+                            <span style="font-size: 20px;">RM <span id="failedTotal">0.00</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 16px;">
+                    <button class="btn-secondary" onclick="tryAgain()" style="flex: 1;">Try again</button>
+                    <button class="btn-primary" onclick="goBackToPayment()" style="flex: 2;">New payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let orderData = null;
+        let selectedPaymentMethod = '';
+        let timerInterval;
+        let uploadedFiles = {};
+
+        // Load data when page loads
+        window.onload = function() {
+            console.log('Page loaded');
+            
+            // Get data from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataParam = urlParams.get('data');
+            
+            if (dataParam) {
+                try {
+                    const decodedData = decodeURIComponent(dataParam);
+                    orderData = JSON.parse(decodedData);
+                    console.log('Order data:', orderData);
+                    
+                    updateOrderSummary(orderData);
+                    updatePaymentPage(orderData);
+                    
+                    if (orderData.customer) {
+                        document.getElementById('fullName').value = orderData.customer.name || '';
+                        document.getElementById('email').value = orderData.customer.email || '';
+                        document.getElementById('phone').value = orderData.customer.phone || '';
+                        document.getElementById('address').value = orderData.customer.address || '';
+                    }
+                    
+                } catch (e) {
+                    console.error('Failed to parse data:', e);
+                    showSampleData();
+                }
+            } else {
+                console.log('No data, showing sample');
+                showSampleData();
+            }
+        };
+
+        // Show sample data
+        function showSampleData() {
+            orderData = {
+                orderId: "404-" + Date.now(),
+                items: [
+                    { name: "Cross Me", sku: "CROSS-001", price: 54.00, quantity: 1 },
+                    { name: "Dark Humour", sku: "DH-30", price: 180.00, quantity: 1 },
+                    { name: "Aura", sku: "AURA-25", price: 63.00, quantity: 1 }
+                ],
+                subtotal: 297.00,
+                shipping: 5.00,
+                tax: 17.82,
+                total: 319.82,
+                currency: "MYR"
+            };
+            updateOrderSummary(orderData);
+            updatePaymentPage(orderData);
+        }
+
+        // Update order summary on page 1
+        function updateOrderSummary(data) {
+            document.getElementById('orderId').textContent = `#${data.orderId || '404-001'}`;
+            document.getElementById('itemCount').textContent = data.items ? data.items.length : 0;
+            
+            const itemsList = document.getElementById('cartItemsList');
+            itemsList.innerHTML = '';
+            
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'cart-item';
+                    itemDiv.innerHTML = `
+                        <div class="item-info">
+                            <strong>${item.name || 'Product'}</strong>
+                            <p>${item.sku || 'N/A'} · ${item.quantity || 1} pcs</p>
+                        </div>
+                        <div class="item-price">RM ${(item.price * (item.quantity || 1)).toFixed(2)}</div>
+                    `;
+                    itemsList.appendChild(itemDiv);
+                });
+            }
+            
+            document.getElementById('subtotal').textContent = (data.subtotal || 0).toFixed(2);
+            document.getElementById('tax').textContent = (data.tax || 0).toFixed(2);
+            document.getElementById('total').textContent = (data.total || 0).toFixed(2);
+        }
+
+        // Update payment page with totals
+        function updatePaymentPage(data) {
+            document.getElementById('paymentOrderId').textContent = `#${data.orderId || '404-001'}`;
+            document.getElementById('paymentTotal').textContent = (data.total || 0).toFixed(2);
+            document.getElementById('tngAmount').textContent = (data.total || 0).toFixed(2);
+            document.getElementById('tngAmount2').textContent = (data.total || 0).toFixed(2);
+            document.getElementById('grabAmount').textContent = (data.total || 0).toFixed(2);
+            document.getElementById('grabAmount2').textContent = (data.total || 0).toFixed(2);
+        }
+
+        // Handle file upload
+        function handleFileUpload(input, type) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                return;
+            }
+
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file');
+                return;
+            }
+
+            // Store file
+            uploadedFiles[type] = file;
+
+            // Update UI
+            const fileName = document.getElementById(`${type}FileName`);
+            const preview = document.getElementById(`${type}Preview`);
+            const uploadDiv = document.getElementById(`${type}Upload`);
+
+            fileName.textContent = file.name;
+            uploadDiv.classList.add('has-file');
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Page navigation
+        function goToPayment() {
+            const name = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            
+            if (!name || !email || !phone || !address) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (!orderData) orderData = {};
+            orderData.customer = {
+                name: name,
+                email: email,
+                phone: phone,
+                address: address
+            };
+            
+            document.getElementById('pageDetails').classList.add('hidden');
+            document.getElementById('pagePayment').classList.remove('hidden');
+        }
+
+        function goBackToDetails() {
+            document.getElementById('pagePayment').classList.add('hidden');
+            document.getElementById('pageDetails').classList.remove('hidden');
+        }
+
+        function goBackToPayment() {
+            document.getElementById('pageReceiptFailed').classList.add('hidden');
+            document.getElementById('pagePayment').classList.remove('hidden');
+        }
+
+        // Select payment method
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+            
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            // 由于event可能未定义，使用当前点击的元素需要传入event，这里简单处理：从全局获取活动元素？但为了兼容，使用active类手动加？用下面方式:
+            // 但因为调用时没有传入event，无法直接使用event.currentTarget。改进：让调用时传入this。但为了保持简洁，可以用一个变通：通过点击事件，但这里我们保持原样，在onclick中传入this。
+            // 快速修复：我们给每个onclick传入this，但改动稍大。为了不影响功能，我们保留原selectPayment逻辑，但需要手动传入元素。这里使用一个备用方法：在onclick里调用selectPayment并传入this。
+            // 但上面已经写了onclick="selectPayment('card')" 没有传入this。为了让选中状态生效，我们稍作修改：通过查询所有option并移除selected，然后根据method手动标记。
+            // 重新标记当前选中的option：根据文本内容找到对应的option加selected类。简单实现：
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                const text = opt.innerText;
+                if ((method === 'card' && text.includes('Card')) ||
+                    (method === 'tng' && text.includes('TNG')) ||
+                    (method === 'grab' && text.includes('Grab')) ||
+                    (method === 'bank' && text.includes('Public'))) {
+                    opt.classList.add('selected');
+                } else {
+                    opt.classList.remove('selected');
+                }
+            });
+            
+            document.getElementById('cardForm').classList.add('hidden');
+            document.getElementById('tngForm').classList.add('hidden');
+            document.getElementById('grabForm').classList.add('hidden');
+            document.getElementById('bankForm').classList.add('hidden');
+            
+            if (method === 'card') {
+                document.getElementById('cardForm').classList.remove('hidden');
+            } else if (method === 'tng') {
+                document.getElementById('tngForm').classList.remove('hidden');
+                startTimer('timer');
+            } else if (method === 'grab') {
+                document.getElementById('grabForm').classList.remove('hidden');
+                startTimer('grabTimer');
+            } else if (method === 'bank') {
+                document.getElementById('bankForm').classList.remove('hidden');
+                // 默认选中Public Bank
+                document.getElementById('bankSelect').value = 'public';
+            }
+        }
+
+        // Timer for QR codes
+        function startTimer(elementId) {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            let timeLeft = 300;
+            const timerElement = document.getElementById(elementId);
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerElement.textContent = 'Expired';
+                }
+            }, 1000);
+        }
+
+        // Process payment
+        function processPayment() {
+            if (!selectedPaymentMethod) {
+                alert('Please select a payment method');
+                return;
+            }
+
+            // Check if file uploaded for TNG, Grab, or Bank
+            if (selectedPaymentMethod === 'tng' && !uploadedFiles.tng) {
+                alert('Please upload your TNG payment screenshot');
+                return;
+            }
+            if (selectedPaymentMethod === 'grab' && !uploadedFiles.grab) {
+                alert('Please upload your GrabPay payment screenshot');
+                return;
+            }
+            if (selectedPaymentMethod === 'bank' && !uploadedFiles.bank) {
+                alert('Please upload your bank transfer receipt (screenshot)');
+                return;
+            }
+            
+            const success = Math.random() > 0.3;
+            
+            if (success) {
+                showReceipt('success');
+            } else {
+                showReceipt('failed');
+            }
+        }
+
+        // Show receipt page
+        function showReceipt(status) {
+            document.getElementById('pagePayment').classList.add('hidden');
+            
+            if (status === 'success') {
+                updateReceipt();
+                document.getElementById('pageReceiptSuccess').classList.remove('hidden');
+            } else {
+                updateFailedPage();
+                document.getElementById('pageReceiptFailed').classList.remove('hidden');
+            }
+        }
+
+        // Update success receipt
+        function updateReceipt() {
+            document.getElementById('receiptOrderId').textContent = orderData.orderId || '404-001';
+            document.getElementById('receiptDate').textContent = new Date().toLocaleString('en-MY', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            
+            let methodName = 'Card';
+            if (selectedPaymentMethod === 'tng') methodName = 'TNG';
+            else if (selectedPaymentMethod === 'grab') methodName = 'Grab';
+            else if (selectedPaymentMethod === 'bank') methodName = 'Public Bank Transfer';
+            document.getElementById('receiptPaymentMethod').textContent = methodName;
+            
+            document.getElementById('receiptTotal').textContent = (orderData.total || 0).toFixed(2);
+            
+            const itemsDiv = document.getElementById('receiptItems');
+            itemsDiv.innerHTML = '';
+            if (orderData.items) {
+                orderData.items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.style.display = 'flex';
+                    itemDiv.style.justifyContent = 'space-between';
+                    itemDiv.style.marginBottom = '12px';
+                    itemDiv.innerHTML = `
+                        <span style="font-size: 14px;">${item.name} × ${item.quantity}</span>
+                        <span style="font-size: 14px;">RM ${(item.price * item.quantity).toFixed(2)}</span>
+                    `;
+                    itemsDiv.appendChild(itemDiv);
+                });
+            }
+
+            // Show uploaded proof on receipt
+            if (selectedPaymentMethod && uploadedFiles[selectedPaymentMethod]) {
+                const proofSection = document.getElementById('paymentProofSection');
+                const proofImage = document.getElementById('paymentProofImage');
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    proofImage.innerHTML = `<img src="${e.target.result}" alt="Payment proof">`;
+                    proofSection.style.display = 'block';
+                };
+                reader.readAsDataURL(uploadedFiles[selectedPaymentMethod]);
+            }
+            
+            if (orderData.customer) {
+                document.getElementById('receiptName').textContent = orderData.customer.name || '-';
+                document.getElementById('receiptEmail').textContent = orderData.customer.email || '-';
+                document.getElementById('receiptAddress').textContent = orderData.customer.address || '-';
+            }
+        }
+
+        // Update failed page
+        function updateFailedPage() {
+            document.getElementById('failedTotal').textContent = (orderData.total || 0).toFixed(2);
+            
+            const itemsDiv = document.getElementById('failedItems');
+            itemsDiv.innerHTML = '';
+            if (orderData.items) {
+                orderData.items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.style.display = 'flex';
+                    itemDiv.style.justifyContent = 'space-between';
+                    itemDiv.style.marginBottom = '12px';
+                    itemDiv.innerHTML = `
+                        <span style="font-size: 14px;">${item.name} × ${item.quantity}</span>
+                        <span style="font-size: 14px;">RM ${(item.price * item.quantity).toFixed(2)}</span>
+                    `;
+                    itemsDiv.appendChild(itemDiv);
+                });
+            }
+            
+            const errors = [
+                'Transaction declined',
+                'Insufficient funds',
+                'Invalid details',
+                'Payment timeout'
+            ];
+            document.getElementById('errorMessage').textContent = errors[Math.floor(Math.random() * errors.length)];
+        }
+
+        function tryAgain() {
+            document.getElementById('pageReceiptFailed').classList.add('hidden');
+            document.getElementById('pagePayment').classList.remove('hidden');
+        }
+
+        function printReceipt() {
+            window.print();
+        }
+
+        function goHome() {
+            window.location.href = 'https://tanpeichin.github.io/checkoutpaymentt/';
+        }
+    </script>
+</body>
+</html>
